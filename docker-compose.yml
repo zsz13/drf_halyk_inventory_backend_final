@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: inventory
+      POSTGRES_USER: zsz13
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./database_dump.sql:/docker-entrypoint-initdb.d/database_dump.sql
+      - pg_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: ["bash", "-c", "while !</dev/tcp/db/5432; do sleep 1; done; cd drfhalyksite; python3 manage.py migrate; python3 manage.py runserver 0.0.0.0:8000"]
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  pg_data:
+

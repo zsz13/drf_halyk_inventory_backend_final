@@ -1,30 +1,24 @@
-from django.shortcuts import render
-from rest_framework import generics, viewsets
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated
-from rest_framework.response import Response
-
-
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from .models import InventoryItem
-from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from .permissions import IsAdmin
 from .serializers import InventoryItemSerializer
 
 
 class InventoryItemAPIList(generics.ListCreateAPIView):
     queryset = InventoryItem.objects.all()
     serializer_class = InventoryItemSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthenticated, )
 
 
 class InventoryItemAPIUpdate(generics.RetrieveUpdateAPIView):
     queryset = InventoryItem.objects.all()
     serializer_class = InventoryItemSerializer
-    permission_classes = (IsAuthenticated, )
-    # authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAdmin,)
 
 
 class InventoryItemAPIDestroy(generics.RetrieveDestroyAPIView):
     queryset = InventoryItem.objects.all()
     serializer_class = InventoryItemSerializer
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (IsAdmin,)
 
