@@ -16,7 +16,12 @@ Including another URLconf
 """
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.template.backends import django
+from django.urls import re_path as url
+from django.templatetags.static import static as django_static
 from django.urls import path, include, re_path
+from django.views.generic import RedirectView
 
 from drfhalyksite import settings
 from inventory.views import InventoryItemAPIList, InventoryItemAPIUpdate, InventoryItemAPIDestroy
@@ -28,7 +33,9 @@ urlpatterns = [
     path('api/v1/inventoryitem/<int:pk>/', InventoryItemAPIUpdate.as_view()),
     path('api/v1/inventoryitemdelete/<int:pk>/', InventoryItemAPIDestroy.as_view()),
     path('api/v1/auth/', include('djoser.urls')),
-    re_path(r'^auth/', include('djoser.urls.authtoken')), #авторизация по токенам
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
+    url(r'^favicon\.ico$', RedirectView.as_view(url='static/inventory/images/favicon.ico')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

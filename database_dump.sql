@@ -343,10 +343,11 @@ CREATE TABLE public.inventory_inventoryitem (
     time_create timestamp with time zone NOT NULL,
     time_update timestamp with time zone NOT NULL,
     is_available boolean NOT NULL,
-    current_location character varying(255),
-    expected_location character varying(255),
-    category_id bigint,
+    current_location character varying(255) NOT NULL,
+    expected_location character varying(255) NOT NULL,
+    category_id bigint NOT NULL,
     user_id integer NOT NULL,
+    image character varying(100) NOT NULL,
     CONSTRAINT inventory_inventoryitem_quantity_check CHECK ((quantity >= 0))
 );
 
@@ -437,7 +438,8 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 2	pbkdf2_sha256$600000$eiszsbIt3NnYxnmA8QaNbI$qSrCrzSpn7qMcLRfEw1cuZRqCzDIuxxSozAA6fCUl98=	2023-11-23 01:59:22.417032-06	f	utest			unittest@gmail.com	f	t	2023-11-22 21:19:09.202719-06
-1	pbkdf2_sha256$600000$cXBE7IyTFdi0iOICRb4q8T$qfO6p6T9uLkj3kcPYWtXmiXGjQb0yCPPr3IzpTY9fJg=	2023-11-23 03:00:25.508255-06	t	root			root@gmail.com	t	t	2023-11-20 10:15:39.902172-06
+3	pbkdf2_sha256$600000$AKjkunpzIivPaBP9BPYkWh$V9Onx0JAP+CuRtGij3d9oLeMbwdl4hrHeljnEBsTMSs=	2023-11-25 04:06:55.841414-06	f	test			test_user@gmail.com	f	t	2023-11-25 04:04:45.813987-06
+1	pbkdf2_sha256$600000$cXBE7IyTFdi0iOICRb4q8T$qfO6p6T9uLkj3kcPYWtXmiXGjQb0yCPPr3IzpTY9fJg=	2023-12-06 07:31:54.722908-06	t	root			root@gmail.com	t	t	2023-11-20 10:15:39.902172-06
 \.
 
 
@@ -470,6 +472,10 @@ COPY public.authtoken_token (key, created, user_id) FROM stdin;
 --
 
 COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+1	2023-12-05 11:48:25.001342-06	10	atf	3		8	1
+2	2023-12-05 11:48:36.890331-06	9	atfaaf	3		8	1
+3	2023-12-05 11:48:50.93732-06	8	test_image	3		8	1
+4	2023-12-05 11:52:45.97231-06	7	dlya unit testa	3		8	1
 \.
 
 
@@ -520,6 +526,8 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 22	inventory	0002_alter_inventoryitem_price	2023-11-20 09:15:48.930458-06
 23	inventory	0003_inventoryitem_user	2023-11-20 09:15:48.973301-06
 24	sessions	0001_initial	2023-11-20 09:15:49.040903-06
+25	inventory	0004_inventoryitem_image_alter_inventoryitem_category_and_more	2023-11-25 03:55:45.150327-06
+26	inventory	0005_alter_inventoryitem_description_and_more	2023-11-25 05:47:39.078196-06
 \.
 
 
@@ -529,7 +537,12 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 
 COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
 vleq9qsyt340vlb96s67t92yw584kv8d	.eJxVjDsOwjAQBe_iGlle_Kek5wyWvbvCAWRLcVIh7g5BKaCdmfeeIuV1qWkdPKeJxEmAOPyykvHObRN0y-3aJfa2zFORWyJ3O-SlEz_Oe_t3UPOonzVy9MoWm12wURGgKZANmELHAKgsObaaEZT32kVEsPwloGMwQE683tVJNz0:1r56xA:-YZyS4ZUJ2j4s8MqhTZk3rDHhHWwvonfbQUZHSOHqqs	2023-12-04 10:16:52.062268-06
-n78jq99cc0sqqzb1gtokmjf0t7wc7bsr	.eJxVjDsOwjAQBe_iGlle_Kek5wyWvbvCAWRLcVIh7g5BKaCdmfeeIuV1qWkdPKeJxEmAOPyykvHObRN0y-3aJfa2zFORWyJ3O-SlEz_Oe_t3UPOonzVy9MoWm12wURGgKZANmELHAKgsObaaEZT32kVEsPwloGMwQE683tVJNz0:1r65ZR:RXwzmzCHpTHQXQudZ343GXHfdSNRd_WBdi_6TAVR6SU	2023-12-07 03:00:25.554136-06
+g3bpu18gb3vi9bd4nw1trt2n9bof3s96	.eJxVjDsOwjAQBe_iGlle_Kek5wyWvbvCAWRLcVIh7g5BKaCdmfeeIuV1qWkdPKeJxEmAOPyykvHObRN0y-3aJfa2zFORWyJ3O-SlEz_Oe_t3UPOonzVy9MoWm12wURGgKZANmELHAKgsObaaEZT32kVEsPwloGMwQE683tVJNz0:1r6rCu:k2rE1Q7iXfOqk8o03_HNe-dWnoNFkscswg116UnYhrU	2023-12-09 05:52:20.412588-06
+wuks3n3498lll3aeqfulqwephcvjghay	.eJxVjDsOwjAQBe_iGlle_Kek5wyWvbvCAWRLcVIh7g5BKaCdmfeeIuV1qWkdPKeJxEmAOPyykvHObRN0y-3aJfa2zFORWyJ3O-SlEz_Oe_t3UPOonzVy9MoWm12wURGgKZANmELHAKgsObaaEZT32kVEsPwloGMwQE683tVJNz0:1rAa8v:lxEYLigyEoi4rbVz2E14ljD9GGGyWq_r724cI9TupAM	2023-12-19 12:27:37.963646-06
+7sckttb8unb4antmfqt92jrvlpemf9ik	.eJxVjDsOwjAQBe_iGlle_Kek5wyWvbvCAWRLcVIh7g5BKaCdmfeeIuV1qWkdPKeJxEmAOPyykvHObRN0y-3aJfa2zFORWyJ3O-SlEz_Oe_t3UPOonzVy9MoWm12wURGgKZANmELHAKgsObaaEZT32kVEsPwloGMwQE683tVJNz0:1rAmzs:UAualHv6cgkkw_2ySpQbcUdBbgtFBZBYNPTSpFkdYaQ	2023-12-20 02:11:08.788367-06
+ew3rlwotijrlyyhusi76d2vt1zlpydg6	.eJxVjDsOwjAQBe_iGlle_Kek5wyWvbvCAWRLcVIh7g5BKaCdmfeeIuV1qWkdPKeJxEmAOPyykvHObRN0y-3aJfa2zFORWyJ3O-SlEz_Oe_t3UPOonzVy9MoWm12wURGgKZANmELHAKgsObaaEZT32kVEsPwloGMwQE683tVJNz0:1rApnW:_vYtIZxujfT9NSwovYpivM2r725hVjWYjWfr6iMCR1Q	2023-12-20 05:10:34.72972-06
+b2uls2ymuqesibs0ynlnrei3059t5hc4	.eJxVjDsOwjAQBe_iGlle_Kek5wyWvbvCAWRLcVIh7g5BKaCdmfeeIuV1qWkdPKeJxEmAOPyykvHObRN0y-3aJfa2zFORWyJ3O-SlEz_Oe_t3UPOonzVy9MoWm12wURGgKZANmELHAKgsObaaEZT32kVEsPwloGMwQE683tVJNz0:1rAq1h:iaKeJ1F0I7MogDNE9vVfdO6KWKrfRC41Ik3aTZQ7y4M	2023-12-20 05:25:13.631176-06
+3aduhz4vl5crvu69cy72bkuvoxs9z0bp	.eJxVjDsOwjAQBe_iGlle_Kek5wyWvbvCAWRLcVIh7g5BKaCdmfeeIuV1qWkdPKeJxEmAOPyykvHObRN0y-3aJfa2zFORWyJ3O-SlEz_Oe_t3UPOonzVy9MoWm12wURGgKZANmELHAKgsObaaEZT32kVEsPwloGMwQE683tVJNz0:1rAs0I:U-qi8tfG3wyF3dUQch3TpwMRdOxR-uO9pmkPu1iz4OE	2023-12-20 07:31:54.757215-06
 \.
 
 
@@ -548,14 +561,14 @@ COPY public.inventory_category (id, name) FROM stdin;
 -- Data for Name: inventory_inventoryitem; Type: TABLE DATA; Schema: public; Owner: zsz13
 --
 
-COPY public.inventory_inventoryitem (id, name, description, quantity, price, time_create, time_update, is_available, current_location, expected_location, category_id, user_id) FROM stdin;
-1	macbook pro 17 retina	в хорошем состоянии	1	700000.00	2023-11-22 08:05:54.703129-06	2023-11-22 08:05:54.703143-06	t	Аль-Фараби 34	Толеби 100	1	1
-2	macbook pro 15	треснут дисплей	1	300000.00	2023-11-22 08:06:34.157459-06	2023-11-22 08:06:34.157471-06	t	Аль-Фараби 34	Казыбек би 303	1	1
-3	Стол ручной работы	мраморный коричневого цвета	1	500000.00	2023-11-22 08:07:55.902281-06	2023-11-22 08:07:55.902298-06	t	Аль-Фараби 34	Богенбай батыра 54	2	1
-4	стул офисный Zeta с регулировками RT892	новый	50	4000000.00	2023-11-22 08:09:38.107288-06	2023-11-22 08:09:38.107319-06	t	Аль-Фараби 34	Абая 200	2	1
-5	архив договоров ИП	за 2022 год второе полугодие	1	\N	2023-11-22 08:11:13.69398-06	2023-11-22 08:11:13.693993-06	t	Аль-Фараби 34	Абая 200	3	1
-6	архив сотрудников	за 2022 год первое полугодие	1	\N	2023-11-22 08:12:06.144926-06	2023-11-22 08:12:06.144939-06	t	Аль-Фараби 34	Фурманова 98	3	1
-7	dlya unit testa	unit test	13	100.00	2023-11-22 21:10:26.064122-06	2023-11-22 21:10:26.064155-06	t	sjgfsejgisjgsgg	wpwwpkwpwtwptkwtp	3	1
+COPY public.inventory_inventoryitem (id, name, description, quantity, price, time_create, time_update, is_available, current_location, expected_location, category_id, user_id, image) FROM stdin;
+12	iMac 27	Новый в коробке	10	1090990.00	2023-12-05 12:23:26.547277-06	2023-12-05 12:23:26.547294-06	t	Аль-Фараби 34	Толеби 100	1	1	items_images/2023/12/06/imac27.jpeg
+1	macbook pro 17 retina	в хорошем состоянии	1	700000.00	2023-11-22 08:05:54.703129-06	2023-12-05 12:32:13.863922-06	t	Аль-Фараби 34	Толеби 100	1	1	items_images/2023/12/06/macbookpro17.jpeg
+2	macbook pro 15	треснут дисплей	1	300000.00	2023-11-22 08:06:34.157459-06	2023-12-05 12:33:50.456733-06	t	Аль-Фараби 34	Казыбек би 303	1	1	items_images/2023/12/06/macbookpro15.jpeg
+3	Стол ручной работы	мраморный коричневого цвета	1	500000.00	2023-11-22 08:07:55.902281-06	2023-12-05 12:35:26.410729-06	t	Аль-Фараби 34	Богенбай батыра 54	2	1	items_images/2023/12/06/mramornistol.png
+4	стул офисный Zeta с регулировками RT892	новый	50	4000000.00	2023-11-22 08:09:38.107288-06	2023-12-05 12:36:59.01445-06	t	Аль-Фараби 34	Абая 200	2	1	items_images/2023/12/06/stulzeta.jpg
+5	архив договоров ИП	за 2022 год второе полугодие	1	\N	2023-11-22 08:11:13.69398-06	2023-12-05 12:38:50.511012-06	t	Аль-Фараби 34	Абая 200	3	1	items_images/2023/12/06/arhivdogovorovip.jpeg
+6	архив сотрудников	за 2022 год первое полугодие	1	\N	2023-11-22 08:12:06.144926-06	2023-12-05 12:39:44.097699-06	t	Аль-Фараби 34	Фурманова 98	3	1	items_images/2023/12/06/arhivsotrudnikov.jpg
 \.
 
 
@@ -591,7 +604,7 @@ SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zsz13
 --
 
-SELECT pg_catalog.setval('public.auth_user_id_seq', 2, true);
+SELECT pg_catalog.setval('public.auth_user_id_seq', 3, true);
 
 
 --
@@ -605,7 +618,7 @@ SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zsz13
 --
 
-SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 4, true);
 
 
 --
@@ -619,7 +632,7 @@ SELECT pg_catalog.setval('public.django_content_type_id_seq', 10, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zsz13
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 24, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 26, true);
 
 
 --
@@ -633,7 +646,7 @@ SELECT pg_catalog.setval('public.inventory_category_id_seq', 3, true);
 -- Name: inventory_inventoryitem_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zsz13
 --
 
-SELECT pg_catalog.setval('public.inventory_inventoryitem_id_seq', 7, true);
+SELECT pg_catalog.setval('public.inventory_inventoryitem_id_seq', 12, true);
 
 
 --
@@ -921,6 +934,20 @@ CREATE INDEX inventory_category_name_c89a8bc0_like ON public.inventory_category 
 --
 
 CREATE INDEX inventory_inventoryitem_category_id_06acb4f3 ON public.inventory_inventoryitem USING btree (category_id);
+
+
+--
+-- Name: inventory_inventoryitem_name_3f6d393f; Type: INDEX; Schema: public; Owner: zsz13
+--
+
+CREATE INDEX inventory_inventoryitem_name_3f6d393f ON public.inventory_inventoryitem USING btree (name);
+
+
+--
+-- Name: inventory_inventoryitem_name_3f6d393f_like; Type: INDEX; Schema: public; Owner: zsz13
+--
+
+CREATE INDEX inventory_inventoryitem_name_3f6d393f_like ON public.inventory_inventoryitem USING btree (name varchar_pattern_ops);
 
 
 --
