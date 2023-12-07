@@ -9,9 +9,7 @@ WORKDIR app/
 RUN python -m venv /venv
 ENV PATH="/venv/bin:$PATH"
 
-COPY requirements.txt .
-COPY drfhalyksite .
-COPY database_dump.sql .
+COPY requirements.txt drfhalyksite database_dump.sql ./
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install -r requirements.txt
