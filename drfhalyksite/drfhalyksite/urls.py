@@ -16,10 +16,7 @@ Including another URLconf
 """
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.template.backends import django
 from django.urls import re_path as url
-from django.templatetags.static import static as django_static
 from django.urls import path, include, re_path
 from django.views.generic import RedirectView
 

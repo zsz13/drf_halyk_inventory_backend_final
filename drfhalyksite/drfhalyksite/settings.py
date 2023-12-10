@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os.path
 from pathlib import Path
 
+from django.utils import timezone
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'corsheaders',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -53,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    # 'inventory.auth_middleware.authentication_auth',
 ]
 
 ROOT_URLCONF = 'drfhalyksite.urls'
@@ -158,13 +162,14 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    # "https://yourproductiondomain.com",
 ]
 
 # LOGGING = {
-#     'version': 1,
+    # 'version': 1,
 #     'disable_existing_loggers': False,
 #     'handlers': {
+#         'console': {'class': 'logging.StreamHandler'}
+#     },
 #         'file': {
 #             'level': 'INFO',
 #             'class': 'logging.FileHandler',
@@ -172,11 +177,37 @@ CORS_ALLOWED_ORIGINS = [
 #         },
 #     },
 #     'loggers': {
+#         'django.db.backends': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG'
+#         }
 #         'django': {
 #             'handlers': ['file'],
 #             'level': 'INFO',
 #             'propagate': True,
-#         },
-#     },
+#         }
+#     }
 # }
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Almaty'
+
+CELERY_BEAT_SCHEDULE = {
+    'send-email-notification': {
+        'task': 'inventory.tasks.send_email_notification',
+        'schedule': timezone.timedelta(minutes=1),
+    },
+}
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'osvobozdennyjdzango37@gmail.com'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+REDIS_HOST = '0.0.0.0'
+REDIS_PORT = '6379'
