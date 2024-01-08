@@ -14,48 +14,30 @@ services:
       - pg_data:/var/lib/postgresql/data
     restart: always
 
-  redis:
-    image: redis
-    hostname: redis
-
-  worker:
-    build:
-      context: .
-    hostname: worker
-    entrypoint: celery
-    command: -A celery_app.app worker --loglevel=info
-    volumes:
-      - .:/app
-    links:
-      - redis
-    depends_on:
-      - redis
-
-  flower:
-    build:
-      context: .
-    hostname: flower
-    entrypoint: celery
-    command: -A celery_app.app flower
-    volumes:
-      - .:/app
-    links:
-      - redis
-    depends_on:
-      - redis
+  rabbitmq:
+    image: "rabbitmq:3-management"
     ports:
-    -  "5555:5555"
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+
 
   web:
     build: .
-    command: ["bash", "-c", "while !</dev/tcp/db/5432; do sleep 1; done; cd drfhalyksite; python3 manage.py migrate; \
-              gunicorn -c gunicorn_config.py drfhalyksite.wsgi:application 0.0.0.0:8000"]
+    command: ["bash", "-c", "while !</dev/tcp/db/5432; do sleep 1; done; sleep 30; cd drfhalyksite; \
+              python3 manage.py migrate; celery -A drfhalyksite worker -l info; celery -A drfhalyksite beat -l info; \
+              celery -A drfhalyksite flower; \
+              uvicorn drfhalyksite.asgi:application --host 0.0.0.0 --reload --log-level info",]
+
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     depends_on:
       - db
+      - rabbitmq
     restart: always
     environment:
       - DB_HOST=db

@@ -9,3 +9,7 @@ uvicorn==0.24.0.post1
 celery==5.3.6
 redis==5.0.1
 flower==2.0.1
+amqp==5.2.0
+django-celery-beat==2.5.0
+SQLAlchemy==2.0.25
+tzdata==2023.4

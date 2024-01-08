@@ -189,23 +189,20 @@ CORS_ALLOWED_ORIGINS = [
 #     }
 # }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# CELERY_RESULT_BACKEND = 'db+postgresql://zsz13:password@localhost/inventory'
+CELERY_RESULT_BACKEND = 'db+postgresql://zsz13:password@DB_HOST/inventory'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Almaty'
 
-CELERY_BEAT_SCHEDULE = {
-    'send-email-notification': {
-        'task': 'inventory.tasks.send_email_notification',
-        'schedule': timezone.timedelta(minutes=1),
-    },
-}
-
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'osvobozdennyjdzango37@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_PASSWORD = 'bbgmobnxjwjrwefi'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
