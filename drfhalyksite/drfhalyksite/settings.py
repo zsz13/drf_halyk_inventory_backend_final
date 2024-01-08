@@ -201,8 +201,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Almaty'
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'osvobozdennyjdzango37@gmail.com'
-EMAIL_HOST_PASSWORD = 'bbgmobnxjwjrwefi'
+EMAIL_HOST_USER = 'XXX@gmail.com'
+EMAIL_HOST_PASSWORD = 'XXX'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
